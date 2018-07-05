@@ -1,6 +1,10 @@
 const express = require('express')
-const app = express()
+const cors = require('cors')
+const morgan = require('morgan')
 const bodyParser = require('body-parser')
+
+const app = express()
+
 
 let persons = [
     {
@@ -24,13 +28,50 @@ let persons = [
       number: '040-123456'
     }
 ]
+morgan.token('oma', function ( req, res) { 
+  return[
+        JSON.stringify(req.body),
+        JSON.stringify(res.body),
+  ]
+})
 
+
+morgan.token('id', function getId (req) {
+  return req.id
+})
+app.use(cors())
+app.use(bodyParser.json({ type: 'application/json' }));
 app.use(bodyParser.json())
 
+
+app.use(morgan('tiny'))
+app.use(morgan(':id :method :url :response-time :oma'))
+app.use(morgan('dev'))
+app.use(morgan('combined'))
+app.use(morgan('common'))
+app.use(cors())
+//morgan('tiny')
+
+morgan(function (tokens, req, res) {
+  return [
+    tokens.method(req, res),
+    tokens.url(req, res),
+    tokens.status(req, res),
+    tokens.res(req, res, 'content-length'), 
+    '-',
+    tokens['response-time'](req, res), 'ms',
+    tokens.req(req,res),
+    tokens.oma(req,res)
+  ].join(' ')
+})
+
+
+
 const generateId = () => {
-  const maxId = persons.length > 0 ? persons.map(n => n.id).sort().reverse()[0] : 1
+  const maxId = persons.length > 0 ? persons.map(p => p.id).sort().reverse()[0] : 1
   return maxId + 1
 }
+
 
 app.get('/', (req, res) => {
   res.send('<h1>Puhelin luettelo v0.0.1</h1>')
