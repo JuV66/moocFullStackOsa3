@@ -43,6 +43,7 @@ app.use(cors())
 app.use(bodyParser.json({ type: 'application/json' }));
 app.use(bodyParser.json())
 
+app.use(express.static('build')) // tarvitaan siihen että fortti koodi saadaan ajettua
 
 app.use(morgan('tiny'))
 app.use(morgan(':id :method :url :response-time :oma'))
