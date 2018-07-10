@@ -78,7 +78,7 @@ app.get('/', (req, res) => {
   res.send('<h1>Puhelin luettelo v0.0.1</h1>')
 })
 
-app.get('/info', (req, res) => {
+app.get('/api/info', (req, res) => {
   const text = '<p>puhelinluettelossa ' + persons.length + ' henkilön tiedot</p>'
   const aika = new Date() 
   const body = text + '<p>' + aika + '</p>'
