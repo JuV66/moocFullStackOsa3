@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 
-//const url = 'mongodb://jussi:abc123@ds235181.mlab.com:35181/juvtest'
+if ( process.env.NODE_ENV !== 'production' ) {
+  require('dotenv').config()
+}
 const url = process.env.MONGODB_URI
 
 /*if (url === undefined) {

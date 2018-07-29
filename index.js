@@ -32,10 +32,10 @@ let persons = [
 ]
 */
 
-morgan.token('oma', function ( req, res) { 
+morgan.token('oma', function ( req, res) {
   return[
-        JSON.stringify(req.body),
-        JSON.stringify(res.body),
+    JSON.stringify(req.body),
+    JSON.stringify(res.body),
   ]
 })
 
@@ -44,7 +44,7 @@ morgan.token('id', function getId (req) {
   return req.id
 })
 app.use(cors())
-app.use(bodyParser.json({ type: 'application/json' }));
+app.use(bodyParser.json({ type: 'application/json' }))
 app.use(bodyParser.json())
 
 app.use(express.static('build')) // tarvitaan siihen että fortti koodi saadaan ajettua
@@ -62,7 +62,7 @@ morgan(function (tokens, req, res) {
     tokens.method(req, res),
     tokens.url(req, res),
     tokens.status(req, res),
-    tokens.res(req, res, 'content-length'), 
+    tokens.res(req, res, 'content-length'),
     '-',
     tokens['response-time'](req, res), 'ms',
     tokens.req(req,res),
@@ -70,17 +70,17 @@ morgan(function (tokens, req, res) {
   ].join(' ')
 })
 
-
+/*
 const generateId = () => {
   //const maxId = persons.length > 0 ? persons.map(p => p.id).sort().reverse()[0] : 1
   maxId = Math.random() * 989898
   return maxId + 1
 }
-
+*/
 
 // tässä kaksi esimerkkiä samasta funktiosta
 const formatPerson = (person) => {
-  console.log('formatPerson')
+  //console.log('formatPerson')
   return {
     name: person.name,
     number: person.number,
@@ -107,7 +107,7 @@ app.get('/api/info', (req, res) => {
     .find()
     .then(person => {
       const text = '<p>puhelinluettelossa ' + person.length + ' henkilön tiedot</p>'
-      const aika = new Date() 
+      const aika = new Date()
       const body = text + '<p>' + aika + '</p>'
       res.send(body)
     })
@@ -120,120 +120,107 @@ app.get('/api/persons', (request, response) => {
     console.log("ERROR")
     response.status(500).send({error: 'DB unavailable'})
   }*/
-  console.log ("Person: ",Person)
+  //console.log ('Person: ',Person)
 
   Person
     .find()
     //.find({}, {__v: 0})
     .then(person => {
       //response.json(person.map(formatPerson))})
-      console.log('LISTA')
-      console.log(person)
+      //console.log('LISTA')
+      //console.log(person)
       response.json(person.map(Person.format))
-      //response.json(person.map(formatPerson))
-      Person.connection.close()
+
     })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    
-  /*
+/*
     const id = Number(request.params.id)
     console.log(id)
     const person = persons.find(p => p.id === id)
     console.log(person)
     if ( person ) {
-  */    Person
-          .findById(request.params.id)
-          .then(person => {
-            if (person){
-              response.json(person.map(Person.format))
-              //response.json(formatPerson(person))
-            } else {
-              response.status(404).send({error: 'id not found'})
-            }
-          })
-          .catch(error => {
-            console.log(error)
-            response.status(400).send({error: 'malformatted id'})
-          })
- 
+  */
+  Person
+    .findById(request.params.id)
+    .then(person => {
+      if (person){
+        response.json(person.map(Person.format))
+        //response.json(formatPerson(person))
+      } else {
+        response.status(404).send({ error: 'id not found' })
+      }
+    })
+    .catch(error => {
+      //console.log(error)
+      response.status(400).send({ error: 'malformatted id' + error })
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    /*
-    const id = Number(request.params.id)
-    const person = persons.find(p => p.id === id)
-    if ( person ) {
-      persons = persons.filter(person => person.id !== id)
-      response.status(204).json({ok: 'person' + id + 'poistettu'})
-    } else {
-      response.status(404).json({error: 'id not found'})  
-    }*/
-    Person
-          .findByIdAndRemove(request.params.id)
-          .then(person => {
-            response.json(formatPerson(person))
-            mongoose.connection.close()
-          })
-          .catch(error => {
-            console.log(error)
-            response.status(400).send({error: 'malformatted id'})
-          })
+
+  Person
+    .findByIdAndRemove(request.params.id)
+    .then(person => {
+      response.json(formatPerson(person))
+    })
+    .catch(error => {
+      //console.log(error)
+      response.status(400).send({ error: 'malformatted id' + error })
+    })
 })
 
 app.put('/api/persons/:id', (request, response) => {
-  
-  const body = request.body
 
   const upPerson = {
     number: request.body.number
   }
 
-  console.log("put (upPerson): ", request.body)
+  //console.log('put (upPerson): ', request.body)
 
   Person
-        .findByIdAndUpdate(request.params.id, upPerson, {new:true})
-        .then(updatedPerson => {
-          response.json(formatPerson(updatedPerson))
-        })
-        .catch(error => {
-          console.log(error)
-          response.status(400).send({error: 'malformatted id'})
-        })
+    .findByIdAndUpdate(request.params.id, upPerson, { new:true  })
+    .then(updatedPerson => {
+      response.json(formatPerson(updatedPerson))
+    })
+    .catch(error => {
+      //console.log(error)
+      response.status(400).send({ error: 'malformatted id'+error })
+    })
 })
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
-  console.log(request.headers)
+  //console.log(request.headers)
 
   if (body.name === undefined) {
-    return response.status(400).json({error: 'name missing'})
+    return response.status(400).json({ error: 'name missing' })
   }
-/*
-  if (body.number === undefined) {
-    return response.status(400).json({error: 'number missing'})
-  }
-  const result = persons.find(person => person.name === body.name)
-
-  if (result !== undefined) {
-    return response.status(400).json({error: 'nimi on jo luettelossa'})
-  }
-*/
-  const person = new Person({
-    name: body.name,
-    number: body.number,
-  })
-  person
-    .save()
-    .then(savedPerson => {
-      response.json(formatPerson(savedPerson))
-      //mongoose.connection.close()
+  Person
+    .find({ name: body.name })
+    .then(result => {
+      return result
+    })
+    .then(result => {
+      if (result.length > 0){
+        response.status(400).json({ error: 'name is duplicate' })
+      }else{
+        const person = new Person({
+          name: body.name,
+          number: body.number,
+        })
+        person
+          .save()
+          .then(savedPerson => {
+            response.json(formatPerson(savedPerson))
+          })
+      }
     })
 })
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  //console.log(`Server running on port ${PORT}`)
 })
